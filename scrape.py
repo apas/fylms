@@ -13,9 +13,12 @@ def isTime(input):
   except ValueError:
     return False
 
-artis_url = "http://www.cineplexx.at/service/program.php?type=program&centerId=2&originalVersionTypeFilter=OV"
-apollo_url = "http://www.cineplexx.at/service/program.php?type=program&centerId=8&originalVersionTypeFilter=OV"
-village_url = "http://www.cineplexx.at/service/program.php?type=program&centerId=115&originalVersionTypeFilter=OV"
+artis_url = "http://www.cineplexx.at/service/program.\
+php?type=program&centerId=2&originalVersionTypeFilter=OV"
+apollo_url = "http://www.cineplexx.at/service/program.\
+php?type=program&centerId=8&originalVersionTypeFilter=OV"
+village_url = "http://www.cineplexx.at/service/program.\
+php?type=program&centerId=115&originalVersionTypeFilter=OV"
 
 artis = requests.get(artis_url)
 apollo = requests.get(apollo_url)
@@ -26,7 +29,7 @@ tree_apollo = html.fromstring(apollo.content.encode('utf-16'))
 tree_village = html.fromstring(village.content.encode('utf-16'))
 
 xpath_str = "//div[@class='overview-element separator']//h2//a/text() \
-  | //div[@class='span6']//p[@class='time-desc']/text()"
+| //div[@class='span6']//p[@class='time-desc']/text()"
 artis_films = tree_artis.xpath(xpath_str)
 apollo_films = tree_apollo.xpath(xpath_str)
 village_films = tree_village.xpath(xpath_str)
