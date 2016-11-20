@@ -21,8 +21,7 @@ def retrieveMovie(xml):
   # fall back to movie search if no movie is found
   for node in xml.iter('root'):
     if node.get('response') == 'False':
-      print "Movie not found!"
-      sys.exit()
+      raise ValueError("Movie not found.")
     else:
       xml = xml.getroot()
       return printInfo(xml)
