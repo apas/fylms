@@ -93,21 +93,26 @@ def append_ratings(dicts):
 
 # for a specific theater:
 # for its films with a letterboxd rating >= 3.2
-# return film name, showtimes, and rating in a string
+# return film name, letterboxd url, showtimes, and rating in a string
 def print_data(dicts):
   res = ""
   for k, v in dicts.iteritems():
     rating = 0.0
     times = ""
+    imdb = ""
     for val in v:
       if not isTime(val) and not val.startswith("tt"):
         if float(val) >= 3.2:
           rating = float(val)
       if isTime(val):
         times = times + " " + val + " "
+      if val.startswith("tt"):
+        imdb = str(val)
 
     if rating >= 3.2:
+      url = "http://letterboxd.com/imdb/" + imdb
       res = res + "\t" + k + "\n"
+      res = res + "\t" + url + "\n"
       res = res + "\t" + times[1:] + "\n"
       res = res + "\t" + "Rating: " + str(rating) + "\n"
       res = res + "\n"
