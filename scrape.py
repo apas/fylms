@@ -3,6 +3,7 @@ import sys, time, json, datetime, locale, itertools
 from lxml import html, etree
 from collections import defaultdict
 import terminalmdb as imdb
+import config
 
 reload(sys) # helpers for utf-8
 sys.setdefaultencoding('utf-8')
@@ -78,6 +79,7 @@ def append_ratings(dicts):
 # print json.dumps(village_dict, ensure_ascii=False, indent=2)
 
 def print_data(dicts):
+  res = ""
   for k, v in dicts.iteritems():
     rating = 0.0
     times = ""
@@ -89,27 +91,50 @@ def print_data(dicts):
         times = times + " " + val + " "
 
     if rating >= 3.2:
-      print "\t" + k
-      print "\t" + times[1:]
-      print "\t" + "Rating: " + str(rating)
-      print "\n"
+      res = res + "\t" + k + "\n"
+      res = res + "\t" + times[1:] + "\n"
+      res = res + "\t" + "Rating: " + str(rating) + "\n"
+      res = res + "\n"
 
-artis_dict = create_dict(artis_films)
-apollo_dict = create_dict(apollo_films)
-village_dict = create_dict(village_films)
+  return res
 
-get_ids(artis_dict)
-get_ids(apollo_dict)
-get_ids(village_dict)
+def prepare_data():
+  global artis_dict # ugly globals but print_movies() needs access
+  global apollo_dict
+  global village_dict
 
-append_ratings(artis_dict)
-append_ratings(apollo_dict)
-append_ratings(village_dict)
+  artis_dict = create_dict(artis_films)
+  apollo_dict = create_dict(apollo_films)
+  village_dict = create_dict(village_films)
 
-print "Today's movie recommendations:\n"
-print "@ Artis International Cinema"
-print_data(artis_dict)
-print "@ Apollo Cinema"
-print_data(apollo_dict)
-print "@ Village Wien Mitte"
-print_data(village_dict)
+  get_ids(artis_dict)
+  get_ids(apollo_dict)
+  get_ids(village_dict)
+
+  append_ratings(artis_dict)
+  append_ratings(apollo_dict)
+  append_ratings(village_dict)
+
+def print_movies():
+  res = ""
+  res = res + "Today's movie recommendations:\n\n"
+  res = res + "@ Artis International Cinema" + "\n"
+  res = res + print_data(artis_dict)
+  res = res + "@ Apollo Cinema" + "\n"
+  res = res + print_data(apollo_dict)
+  res = res + "@ Village Wien Mitte" + "\n"
+  res = res + print_data(village_dict)
+
+  return res 
+
+def send_email():
+  return requests.post(config.api_url,
+      auth=("api", config.api_key),
+      data={"from": config.from_mail,
+            "to": config.to_mail,
+            "subject": "Today's movie recommendations",
+            "text": print_movies()})
+
+if __name__ == '__main__':
+  prepare_data()
+  send_email()
