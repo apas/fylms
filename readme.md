@@ -27,8 +27,14 @@ film's permalink.
 Furthermore: code's kind of ugly. It's more of a proof of concept for now.
 Will get optimized later. But _It Works!™_
 
+Tip: use fylms in a cron job.
+
 **Q:** _Why R ≥ 3.2?_  
 **A:** Idk.  ¯\\\_(ツ)_/¯
+
+## Screenshots
+
+![Demo screenshot](http://i.imgur.com/IcJYzMt.png)
 
 ## License
 
