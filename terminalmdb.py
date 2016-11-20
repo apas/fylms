@@ -1,5 +1,6 @@
 """
 simplified https://github.com/zacoppotamus/TerminaIMdB
+lic: gplv3
 """
 
 import urllib
