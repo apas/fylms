@@ -8,6 +8,7 @@ import config
 reload(sys) # helpers for utf-8
 sys.setdefaultencoding('utf-8')
 
+# return True if string is time HH:MM
 def isTime(input):
   try:
     time.strptime(input, "%H:%M")
@@ -15,6 +16,7 @@ def isTime(input):
   except ValueError:
     return False
 
+# theater urls showing only OV films
 artis_url = "http://www.cineplexx.at/service/program.\
 php?type=program&centerId=2&originalVersionTypeFilter=OV"
 apollo_url = "http://www.cineplexx.at/service/program.\
@@ -22,20 +24,26 @@ php?type=program&centerId=8&originalVersionTypeFilter=OV"
 village_url = "http://www.cineplexx.at/service/program.\
 php?type=program&centerId=115&originalVersionTypeFilter=OV"
 
+# load the url
 artis = requests.get(artis_url)
 apollo = requests.get(apollo_url)
 village = requests.get(village_url)
 
+# construct tree out of html
 tree_artis = html.fromstring(artis.content.encode('utf-16'))
 tree_apollo = html.fromstring(apollo.content.encode('utf-16'))
 tree_village = html.fromstring(village.content.encode('utf-16'))
 
+# access the elements we want with `or` constructor
+# h2/a/ = film name
+# p class 'time-desc' = showtimes
 xpath_str = "//div[@class='overview-element separator']//h2//a/text() \
 | //div[@class='span6']//p[@class='time-desc']/text()"
 artis_films = tree_artis.xpath(xpath_str)
 apollo_films = tree_apollo.xpath(xpath_str)
 village_films = tree_village.xpath(xpath_str)
 
+# return a <film, [showtimes]> dictionary out of the accessed films
 def create_dict(films):
   key = films[0].encode('utf-8').strip()
   d = defaultdict(list)
@@ -47,6 +55,8 @@ def create_dict(films):
 
   return d
 
+# get imdb id for letterboxd permalink via zac's terminalmdb
+# append as extra value in dictionary
 def get_ids(dicts):
   for k, v in dicts.iteritems():
     try:
@@ -55,7 +65,8 @@ def get_ids(dicts):
     except ValueError:
       pass
 
-# provided with an imdb id letterboxd redirects to film page
+# (provided with an imdb id, letterboxd redirects to film page)
+# return the film's letterboxd rating in a string
 def get_rating(input):
   movie_url = "http://letterboxd.com/imdb/" + input
   movie = requests.get(movie_url)
@@ -65,12 +76,14 @@ def get_rating(input):
   movie_rating = str(tree_movie.xpath(xpath_str2)[0])
   return movie_rating
 
+# append letterboxd rating in dictionary as extra value
 def append_ratings(dicts):
   for k, v in dicts.iteritems():
     for val in v:
       if val.startswith("tt"):
         dicts[k].append(get_rating(val))
 
+# helper funcs to print jsonified dicts
 # print "\n##########################################\n"
 # print json.dumps(artis_dict, ensure_ascii=False, indent=2)
 # print "\n##########################################\n"
@@ -78,6 +91,9 @@ def append_ratings(dicts):
 # print "\n##########################################\n"
 # print json.dumps(village_dict, ensure_ascii=False, indent=2)
 
+# for a specific theater:
+# for its films with a letterboxd rating >= 3.2
+# return film name, showtimes, and rating in a string
 def print_data(dicts):
   res = ""
   for k, v in dicts.iteritems():
@@ -98,6 +114,7 @@ def print_data(dicts):
 
   return res
 
+# prepare the dictionaries, ratings, etc
 def prepare_data():
   global artis_dict # ugly globals but print_movies() needs access
   global apollo_dict
@@ -115,6 +132,7 @@ def prepare_data():
   append_ratings(apollo_dict)
   append_ratings(village_dict)
 
+# return all movie recommendations for all theaters in a string
 def print_movies():
   res = ""
   res = res + "Today's movie recommendations:\n\n"
@@ -127,6 +145,8 @@ def print_movies():
 
   return res 
 
+# customize mailgun keys in `config.py`
+# send movie recommendations in mail
 def send_email():
   return requests.post(config.api_url,
       auth=("api", config.api_key),
