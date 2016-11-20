@@ -2,6 +2,7 @@ import requests
 import sys, time, json, datetime, locale, itertools
 from lxml import html, etree
 from collections import defaultdict
+import terminalmdb as imdb
 
 reload(sys) # helpers for utf-8
 sys.setdefaultencoding('utf-8')
@@ -45,8 +46,25 @@ def create_dict(films):
 
   return d
 
-print json.dumps(create_dict(artis_films), ensure_ascii=False, indent=2)
+artis_dict = create_dict(artis_films)
+apollo_dict = create_dict(apollo_films)
+village_dict = create_dict(village_films)
+
+def get_ids(dicts):
+  for k, v in dicts.iteritems():
+    try:
+      iid = imdb.getID(k)
+      dicts[k].append(iid)
+    except ValueError:
+      pass
+
+get_ids(artis_dict)
+get_ids(apollo_dict)
+get_ids(village_dict)
+
+# print "\n##########################################\n"
+print json.dumps(artis_dict, ensure_ascii=False, indent=2)
 print "\n##########################################\n"
-print json.dumps(create_dict(apollo_films), ensure_ascii=False, indent=2)
+print json.dumps(apollo_dict, ensure_ascii=False, indent=2)
 print "\n##########################################\n"
-print json.dumps(create_dict(village_films), ensure_ascii=False, indent=2)
+print json.dumps(village_dict, ensure_ascii=False, indent=2)
