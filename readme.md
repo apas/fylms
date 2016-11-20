@@ -17,7 +17,8 @@ bigger than 3.2 in an email.
 
 `$ python scrape.py`
 
-Tip: use fylms in a cron job.
+Tip: use fylms with a local cron job or push to a Heroku dyno and set
+a scheduler.
 
 ## Misc
 
