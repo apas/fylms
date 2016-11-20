@@ -17,6 +17,8 @@ bigger than 3.2 in an email.
 
 `$ python scrape.py`
 
+Tip: use fylms in a cron job.
+
 ## Misc
 
 fylms uses a slightly redacted and simplified version of my buddy Zac's
@@ -26,8 +28,6 @@ film's permalink.
 
 Furthermore: code's kind of ugly. It's more of a proof of concept for now.
 Will get optimized later. But _It Works!™_
-
-Tip: use fylms in a cron job.
 
 **Q:** _Why R ≥ 3.2?_  
 **A:** Idk.  ¯\\\_(ツ)_/¯
