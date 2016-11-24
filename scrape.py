@@ -8,7 +8,7 @@ import config
 reload(sys) # helpers for utf-8
 sys.setdefaultencoding("utf-8")
 logger = logging.getLogger("scrape")
-hdlr = logging.FileHandler("scrape.log")
+hdlr = logging.FileHandler("error.log")
 formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
 hdlr.setFormatter(formatter)
 logger.addHandler(hdlr)
@@ -62,13 +62,25 @@ for film in haydn_films:
 
 # return a <film, [showtimes]> dictionary out of the accessed films
 def create_dict(films):
-  key = films[0].encode('utf-8').strip()
+  try:
+    key = films[0].encode('utf-8').strip()
+  except Exception, e:
+    logger.exception(e)
+    pass
   d = defaultdict(list)
   for film in films:
     if isTime(film.encode('utf-8').strip()):
-      d[key].append(film.encode('utf-8').strip())
+      try:
+        d[key].append(film.encode('utf-8').strip())
+      except Exception, e:
+        logger.exception(e)
+        pass
     else:
-      key = film.encode('utf-8').strip()
+      try:
+        key = film.encode('utf-8').strip()
+      except Exception, e:
+        logger.exception(e)
+        pass
 
   return d
 
@@ -79,7 +91,8 @@ def get_ids(dicts):
     try:
       iid = imdb.getID(k)
       dicts[k].append(iid)
-    except ValueError:
+    except ValueError, e:
+      logger.exception(e)
       pass
 
 # (provided with an imdb id, letterboxd redirects to film page)
@@ -94,7 +107,7 @@ def get_rating(input):
     movie_rating = str(tree_movie.xpath(xpath_str2)[0])
     return movie_rating
   except Exception, e:
-    logger.error(e)
+    logger.exception(e)
     return "0"
 
 # append letterboxd rating in dictionary as extra value
@@ -102,7 +115,11 @@ def append_ratings(dicts):
   for k, v in dicts.iteritems():
     for val in v:
       if val.startswith("tt"):
-        dicts[k].append(get_rating(val))
+        try:
+          dicts[k].append(get_rating(val))
+        except Exception, e:
+          logger.exception(e)
+          pass
 
 # helper funcs to print jsonified dicts
 # print "\n##########################################\n"
